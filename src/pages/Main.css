@@ -1,0 +1,6 @@
+.main-content {
+    padding: 20px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    background-color: #FFFFFF;
+}

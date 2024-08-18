@@ -1,0 +1,162 @@
+.signup-container {
+    display: flex;
+    height: 100vh;
+    align-items: stretch;
+    justify-content: center;
+    background-color: #f4f4f4;
+}
+
+.signup-form {
+    width: 400px;
+    padding: 40px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.signup-form h2 {
+    margin-bottom: 20px;
+    color: #3D4168;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #3D4168;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+
+.form-group.terms {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+
+.form-group.terms input[type="checkbox"] {
+    width: fit-content;
+}
+
+.form-group.terms span {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.form-group.terms a {
+    text-decoration: none;
+    color: #3D4168;
+    font-weight: bold;
+    padding: 0 0 0 5px;
+    background: none;
+    border-radius: 0; 
+}
+
+.form-group.terms a:hover {
+    text-decoration: underline; 
+    background: none; 
+    color: #3D4168;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.success {
+    color: green;
+    font-size: 14px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.signup-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4C51BF;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.signup-button:hover {
+    background-color: #3B42A5;
+}
+
+.auth-options {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.google-signin, .apple-signin {
+    width: 48%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.google-signin {
+    background-color: #fff;
+    color: #555;
+}
+
+.apple-signin {
+    background-color: #000;
+    color: #fff;
+}
+
+.signin-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.signin-link a {
+    color: #3D4168;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.signup-image {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+    overflow: hidden;
+    border-radius: 0 8px 8px 0;
+}
+
+.signup-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

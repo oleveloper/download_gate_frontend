@@ -1,0 +1,47 @@
+.user-profile {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .user-profile img {
+    margin-right: 10px;
+  }
+  
+  .profile-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #ffffff;
+    color: #333;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 200px;
+    border: 1px solid #ddd;
+  }
+  
+  .profile-dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 10px 0;
+  }
+  
+  .profile-dropdown ul li {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .profile-dropdown ul li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .profile-dropdown ul li.signout {
+    color: #e74c3c; 
+  }
+  
+  .profile-dropdown ul li.signout:hover {
+    background-color: #f2dede;
+  }

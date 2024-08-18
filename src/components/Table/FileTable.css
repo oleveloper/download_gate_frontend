@@ -1,0 +1,46 @@
+.search-bar {
+    width: 300px;
+    height: 35px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #E0E1EA;
+    background-color: #F7F8FC;
+    font-size: 14px;
+}
+
+.table-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.download-btn {
+    background-color: #7B7F9E;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.download-btn:hover {
+    background-color: #4C51BF;
+}
+
+.custom-data-grid-row:hover {
+    background-color: #F7F8FC !important;
+}
+  
+.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows {
+    margin: 0;
+}
+
+.MuiDataGrid-row.Mui-selected {
+    background-color: #F7F8FC !important;
+}
+
+.MuiCheckbox-root.Mui-checked {
+    color: #4C51BF !important;
+}
