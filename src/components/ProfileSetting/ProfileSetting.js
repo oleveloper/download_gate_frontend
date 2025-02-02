@@ -58,9 +58,6 @@ function ProfileSetting({ open, onClose }) {
   };
 
   const handleClose = (e, reason) => {
-
-    console.log(reason);
-    e.stopPropagation();
     if (reason && reason === 'backdropClick') {
       return;
     }
@@ -70,7 +67,7 @@ function ProfileSetting({ open, onClose }) {
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Account Settings</DialogTitle>
-      <DialogContent >
+      <DialogContent onMouseDown={(e) => e.stopPropagation()}>
         <div  style={{ textAlign: 'center' }}>
           <Avatar alt="Profile Image" src={profileImage} style={{ width: 100, height: 100, margin: '0 auto' }} />
           <input

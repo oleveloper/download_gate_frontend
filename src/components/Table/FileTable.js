@@ -5,30 +5,39 @@ import { DataGrid } from '@mui/x-data-grid';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './FileTable.css'
 
-function FileTable() {
+function FileTable({ initialFiles = [] }) {
   const { version } = useParams();
   const location = useLocation();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [files, setFiles] = useState([]);
   const [type, setType] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [files, setFiles] = useState(initialFiles);
+  const [selectedFile, setSelectedFile] = useState([]);
+  const rows = files.map((file, index) => ({
+    id: index + 1
+    , ...file,
+  }));
+
   const columns = [
-    { field: 'type', headerName: 'OS', flex:0.5, minWidth: 50, headerAlign: 'center', align: 'center', renderCell: (params) => getIcon(params.value) },
+    { field: 'type', headerName: 'OS', flex:0.5, minWidth: 50, headerAlign: 'center', align: 'center'
+      , renderCell: (params) => getIcon(params.row) },
     { field: 'name', headerName: 'File Name', flex: 3, minWidth: 200},
-    { field: 'size', headerName: 'File Size', flex: 1, minWidth: 100, valueFormatter: ({ value }) => `${(value / 1024).toFixed(2)} KB` },
+    { field: 'size', headerName: 'File Size', flex: 1, minWidth: 100
+      , valueFormatter: (value) => {
+        if (!value || isNaN(value)) return "N/A";
+        return `${(value / (1024 * 1024)).toFixed(2)} MB`;
+      },
+    },
     { field: 'upload_date', headerName: 'Upload Date', minWidth: 100, flex: 1 },
+    { field: 'url', headerName: 'Presigned URL', minWidth: 100, flex: 1},
   ];
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredRows = files.filter((row) => {
-    return (
-      (row.name && row.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (row.age && row.age.toString().includes(searchTerm)) ||
-      (row.country && row.country.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+  const filteredRows = rows.filter((row) => {
+    return row.name && row.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   useEffect(() => {
@@ -44,25 +53,36 @@ function FileTable() {
 
 
   useEffect(() => {
-    if (location.pathname.includes('/patch/files')) {
-      setType('patch');
-    } else if (location.pathname.includes('/jdk/files')) {
-      setType('jdk');
-    } else if (location.pathname.includes('/install/version')) {
+    if (location.pathname.includes('/install/')) {
+      setType('install-version');
+    } else if (location.pathname.includes('/patch/')) {
+      setType('patch-version');
+    } else if (location.pathname.includes('/install')) {
       setType('install');
-    }
-  }, [location.pathname]);
+    } else if (location.pathname.includes('/patch')) {
+      setType('patch');
+    }  else if (location.pathname.includes('/jdk')) {
+      setType('jdk');
+    } else if (location.pathname.includes('/license')) {
+      setType('license');
+    } 
+  }, [location.pathname, type]);
 
   useEffect(() => {
     const fetchFiles = async () => {
       let url = '';
-
       if (type === 'install') {
-        url = `http://localhost:8000/api/install/version/${version}/files/`;
+        url = `http://localhost:8000/api/install/`;
       } else if (type === 'patch') {
-        url = `http://localhost:8000/api/patch/files/`;
+        url = `http://localhost:8000/api/patch/`;
+      } if (type === 'install-version') {
+        url = `http://localhost:8000/api/install/versions/${version}/`;
+      } else if (type === 'patch-version') {
+        url = `http://localhost:8000/api/patch/versions/${version}/`;
       } else if (type === 'jdk') {
-        url = `http://localhost:8000/api/jdk/files/`;
+        url = `http://localhost:8000/api/jdk/`;
+      } else if (type === 'license') {
+        url = `http://localhost:8000/api/license/`;
       }
 
       try {
@@ -70,8 +90,7 @@ function FileTable() {
         .get(url, { withCredentials: true, });
         const files = response.data.files.map((file, index) => ({
           ...file,
-          id: index + 1,
-          type: file.name,
+          id: index + 1
         }));
         setFiles(files);
       } catch (err) {
@@ -80,23 +99,30 @@ function FileTable() {
       }
     };
 
-    if (type && (type !== 'install' || (type === 'install' && version))) {
-      fetchFiles();
-    }
+    fetchFiles();
   }, [type, version]);
 
-  const getIcon = (fileName) => {
-    if (fileName.toLowerCase().includes('linux')) {
+  const getIcon = (file) => {
+    if (!file || !file.name) return '';
+    if (file.name.toLowerCase().includes('linux')) {
       return <i className="bi-tencent-qq"></i>;
     } 
-    if (fileName.toLowerCase().includes('win')) {
+    if (file.name.toLowerCase().includes('win')) {
       return <i className="bi bi-windows"></i>;
     }
     return '';
   };
 
   const handleDownload = () => {
-    alert('Download button clicked');
+    const selectedFiles = files.filter(file => selectedFile.includes(file.id));
+    if (!selectedFiles || selectedFiles.length === 0) {
+      alert("Please select a file to download.");
+      return;
+    }
+    selectedFiles.forEach((row) => {
+      alert('Download button clicked :' + row.url);
+      // TODO
+    });
   };
 
   return (
@@ -109,6 +135,7 @@ function FileTable() {
       <DataGrid
         rows={filteredRows}
         columns={columns}
+        columnVisibilityModel={{ url: false }}
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 10 },
@@ -121,6 +148,10 @@ function FileTable() {
         style={{ width: '100%' }}
         key={windowWidth}
         getRowClassName={(params) => 'custom-data-grid-row'}
+        selectionModel={selectedFile}
+        onRowSelectionModelChange={(selection) => {
+          setSelectedFile(selection);
+        }}
       />
       <div className="table-footer">
         <button className="download-btn" onClick={handleDownload}>

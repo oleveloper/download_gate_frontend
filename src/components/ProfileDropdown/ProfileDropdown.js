@@ -11,21 +11,20 @@ function ProfileDropdown() {
     setIsSettingsOpen(true);
   };
   const handleCloseSettings = (e) => {
+    e.stopPropagation();
     setIsSettingsOpen(false);
   };
 
   return (
-    <div className="profile-dropdown">
+    <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
       <ul>
         <li onClick={handleProfileSetting}>Account</li>
         <li className="signout" onClick={handleSignOut}>Sign Out</li>
       </ul>
 
-      { isSettingsOpen && 
-        <ProfileSetting 
-        open={isSettingsOpen} 
-        onClose={handleCloseSettings} />
-      }
+      <ProfileSetting 
+      open={isSettingsOpen} 
+      onClose={handleCloseSettings} />
     </div>
   );
 }

@@ -99,17 +99,17 @@ function SignUp() {
             <span>I agree to the <a href="#">terms & policy</a></span>
             {errors.terms && <p className="error">{errors.terms}</p>}
           </div>
-          <button type="submit" className="signup-button">Signup</button>
+          <button type="submit" className="signup-button">Sign up</button>
           {success && <p className="success">{success}</p>}
         </form>
-        <div className="auth-options">
+        {/* <div className="auth-options">
           <button className="google-signin">Sign up with Google</button>
           <button className="apple-signin">Sign up with Kakao</button>
-        </div>
-        <p className="signin-link">
-          Have an account? 
+        </div> */}
+        <p className="signin-link" style={{textAlign: 'left'}}>
+          <span style={{color: '#555'}}>Have an account?</span>
           <br/>
-          <button className="signup-button">Sign in</button>
+          <button className="signup-button" onClick={() => navigate('/signin')}>Sign in</button>
         </p>
       </div>
       <div className="signup-image">

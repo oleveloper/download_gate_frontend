@@ -1,50 +1,97 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import ProfileDropdown from '../ProfileDropdown/ProfileDropdown';
+import React, { useEffect, useMemo, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
+import { Account } from '@toolpad/core/Account';
+import { Button, Box } from '@mui/material';
+import { UserContext } from '../../context/UserContext';
+import signOut from '../SignOut/SignOut'; 
+import PersonIcon from '@mui/icons-material/Person';
+
 import './Header.css';
 
-const Header = ({ isAuthenticated, username, profileImageUrl }) => {
-    const [showDropdown, setShowDropdown] = useState(false);
-    const dropdownRef = useRef(null);
+const Header = ({ isAuthenticated, setIsAuthenticated, username, profileImageUrl }) => {
+  const navigate = useNavigate();
+  const userSession = React.useMemo(() => ({
+    user: {
+      name: username,
+      email: '',
+      image: profileImageUrl && typeof profileImageUrl === 'string' ? profileImageUrl : undefined, 
+    },
+  }), [username, profileImageUrl]);
+  const [session, setSession] = React.useState(userSession);
+  const { setUser } = useContext(UserContext);
 
-    const handleProfileClick = () => {
-      setShowDropdown(!showDropdown);
-    };
-    
-    const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          setShowDropdown(false);
-        }
-    };
+  useEffect(() => {
+    setSession(userSession);
+  }, [userSession]);
 
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-          document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-    
-    return (
-        <div className="header">
-            {isAuthenticated ? (
-                <div className="user-profile" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
-                    <img src={profileImageUrl} 
-                    alt={`${username}'s profile`}
-                    style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                    <span>{username}</span>
-                    {showDropdown && 
-                    <div ref={dropdownRef}>
-                        <ProfileDropdown/>
-                    </div>}
-                </div>
-            ) : (
-                <div className="auth-links">
-                <Link to="/signin" className="auth-link">Sign In</Link>
-                <Link to="/signup" className="auth-link">Sign Up</Link>
-                </div>
-            )}
-      </div>
-    );
+  const handleSignOut = () => {
+    signOut(setUser);
+    setIsAuthenticated(false);
+  };
+
+  const authentication = useMemo(() => ({
+    signIn: () => setIsAuthenticated(true),
+    signOut: handleSignOut,
+  }), []);
+
+  const handleProfileSettings = () => {
+    alert("Profile Settings Clicked!"); // TODO
+  };
+
+  return (
+  <div className="header">
+    <AuthenticationContext.Provider value={authentication}>
+      <SessionContext.Provider value={session}>
+        {isAuthenticated && (
+          <Account slotProps={{
+            AccountPreview: {
+              avatarProps: {
+                src: typeof session?.user?.image === 'string' ? session.user.image : undefined,
+                children: !session?.user?.image ? <PersonIcon /> : null,
+              },
+              primaryText: session?.user?.name || "Guest",
+            },
+            SignOutButton: {
+              endAdornment: (
+                <Button variant="outlined" size="small" onClick={handleProfileSettings}>
+                  Profile Settings
+                </Button>
+              ),
+            }
+          }}/>
+        )}
+
+        {!isAuthenticated && (
+          <Box sx={{ display: 'flex', gap: 1, marginLeft: 'auto', alignItems: 'center' }}>
+            <Button
+              variant="contained"
+              sx={{ 
+                bgcolor: '#7B7F9E',
+                color: 'white',
+                '&:hover': { bgcolor: '#4C51BF' }
+              }}
+              onClick={() => navigate('/signin')}
+            >
+              Sign In
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{ 
+                borderColor: '#7B7F9E',
+                color: '#7B7F9E',
+                '&:hover': { borderColor: '#4C51BF', color: '#4C51BF' }
+              }}
+              onClick={() => navigate('/signup')}
+            >
+              Sign Up
+            </Button>
+          </Box>
+        )}
+      </SessionContext.Provider>
+    </AuthenticationContext.Provider>
+</div>
+  );
 };
 
 export default Header;
