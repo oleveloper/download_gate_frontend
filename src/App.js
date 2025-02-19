@@ -33,7 +33,6 @@ function DefaultLayout() {
         method: 'GET',
         credentials: 'include',
       });
-
       if (response.ok) {
         const data = await response.json();
         setIsAuthenticated(data.is_authenticated);
@@ -42,7 +41,7 @@ function DefaultLayout() {
         setUser({
           is_authenticated: data.is_authenticated,
           is_pending: data.is_pending,
-          username: username,
+          username: data.username,
         });
       } else {
         setIsAuthenticated(false);
