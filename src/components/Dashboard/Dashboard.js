@@ -4,7 +4,6 @@ import "./Dashboard.css";
 
 const Dashboard = () => {
     const { user } = useContext(UserContext);
-    console.log(user)
     return (
     <>
     { user && user.is_authenticated ? (
