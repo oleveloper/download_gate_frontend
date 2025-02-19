@@ -65,7 +65,7 @@ function FileTable({ initialFiles = [] }) {
       setType('jdk');
     } else if (location.pathname.includes('/license')) {
       setType('license');
-    } 
+    }
   }, [location.pathname, type]);
 
   useEffect(() => {
@@ -85,6 +85,7 @@ function FileTable({ initialFiles = [] }) {
         url = `http://localhost:8000/api/license/`;
       }
 
+      if (url === '') return;
       try {
         const response = await axios
         .get(url, { withCredentials: true, });
@@ -113,17 +114,24 @@ function FileTable({ initialFiles = [] }) {
     return '';
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const selectedFiles = files.filter(file => selectedFile.includes(file.id));
     if (!selectedFiles || selectedFiles.length === 0) {
       alert("Please select a file to download.");
       return;
     }
-    selectedFiles.forEach((row) => {
-      alert('Download button clicked :' + row.url);
-      // TODO
+
+    selectedFiles.forEach(({ url, name }, index) => {
+      setTimeout(() => {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }, index * 2000);
     });
-  };
+  }
 
   return (
     <div>
