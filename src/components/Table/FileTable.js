@@ -29,7 +29,7 @@ function FileTable({ initialFiles = [] }) {
       },
     },
     { field: 'upload_date', headerName: 'Upload Date', minWidth: 100, flex: 1 },
-    { field: 'url', headerName: 'Presigned URL', minWidth: 100, flex: 1},
+    { field: 'url', headerName: 'Presigned URL', minWidth: 0, flex: 0, hide: true },
   ];
 
   const handleSearchChange = (event) => {
@@ -41,6 +41,10 @@ function FileTable({ initialFiles = [] }) {
   });
 
   useEffect(() => {
+    setSelectedFile([]);
+  }, [location.pathname, files]);
+
+  useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -50,7 +54,6 @@ function FileTable({ initialFiles = [] }) {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
 
   useEffect(() => {
     if (location.pathname.includes('/install/')) {
@@ -69,6 +72,7 @@ function FileTable({ initialFiles = [] }) {
   }, [location.pathname, type]);
 
   useEffect(() => {
+    setFiles([]);
     const fetchFiles = async () => {
       let url = '';
       if (type === 'install') {
@@ -90,8 +94,8 @@ function FileTable({ initialFiles = [] }) {
         const response = await axios
         .get(url, { withCredentials: true, });
         const files = response.data.files.map((file, index) => ({
-          ...file,
           id: index + 1
+          , ...file
         }));
         setFiles(files);
       } catch (err) {
@@ -114,14 +118,14 @@ function FileTable({ initialFiles = [] }) {
     return '';
   };
 
-  const handleDownload = async () => {
+  const handleDownload = (() => {
     const selectedFiles = files.filter(file => selectedFile.includes(file.id));
     if (!selectedFiles || selectedFiles.length === 0) {
       alert("Please select a file to download.");
       return;
     }
 
-    selectedFiles.forEach(({ url, name }, index) => {
+    selectedFiles.forEach(async ({ url, name }, index) => {
       setTimeout(() => {
         const a = document.createElement("a");
         a.href = url;
@@ -131,7 +135,7 @@ function FileTable({ initialFiles = [] }) {
         document.body.removeChild(a);
       }, index * 2000);
     });
-  }
+  });
 
   return (
     <div>
@@ -154,15 +158,19 @@ function FileTable({ initialFiles = [] }) {
         checkboxSelection
         disableSelectionOnClick
         style={{ width: '100%' }}
-        key={windowWidth}
+        key={`${location.key}-${windowWidth}`}
         getRowClassName={(params) => 'custom-data-grid-row'}
-        selectionModel={selectedFile}
+        rowSelectionModel={selectedFile || []}
         onRowSelectionModelChange={(selection) => {
           setSelectedFile(selection);
         }}
       />
       <div className="table-footer">
-        <button className="download-btn" onClick={handleDownload}>
+        <button className="download-btn" onClick={() => {
+          handleDownload();
+          setSelectedFile(null);
+          setTimeout(() => setSelectedFile([]), 100);
+        }}>
           Download
         </button>
       </div>
