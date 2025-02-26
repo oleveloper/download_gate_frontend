@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useLocation } from 'react-router-dom';
 import { DataGrid } from '@mui/x-data-grid';
+import { useSnackbar } from 'notistack';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './FileTable.css'
 
@@ -13,6 +14,8 @@ function FileTable({ initialFiles = [] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [files, setFiles] = useState(initialFiles);
   const [selectedFile, setSelectedFile] = useState([]);
+  const { enqueueSnackbar } = useSnackbar();
+
   const rows = files.map((file, index) => ({
     id: index + 1
     , ...file,
@@ -118,10 +121,29 @@ function FileTable({ initialFiles = [] }) {
     return '';
   };
 
+  const handleCopy = (() => {
+    const selectedFiles = files.filter(file => selectedFile.includes(file.id));
+    let command = '';
+    if (selectedFiles.length === 1) {
+      command = `curl -O ${selectedFiles[0].url}`;
+    } else if (selectedFiles.length > 1) {
+      command =  selectedFiles.map((file) => `curl -O ${file.url}`).join(" && ");
+    }
+
+    if (!command) {
+      enqueueSnackbar("Please select at least one file", { variant: "warning" });
+    } else {
+      navigator.clipboard.writeText(command).then(() => {
+        enqueueSnackbar("Download command copied to clipboard", { variant: "success" });
+      });
+    }
+  })
+
+
   const handleDownload = (() => {
     const selectedFiles = files.filter(file => selectedFile.includes(file.id));
     if (!selectedFiles || selectedFiles.length === 0) {
-      alert("Please select a file to download.");
+      enqueueSnackbar("Please select a file to download", { variant: "warning" });
       return;
     }
 
@@ -166,6 +188,16 @@ function FileTable({ initialFiles = [] }) {
         }}
       />
       <div className="table-footer">
+        <>
+          <button className="download-btn" style={{ margin: '0 8px' }} onClick={() => {
+            handleCopy();
+            setSelectedFile(null);
+            setTimeout(() => setSelectedFile([]), 100);
+          }}>
+            Copy
+          </button>
+        </>
+
         <button className="download-btn" onClick={() => {
           handleDownload();
           setSelectedFile(null);
@@ -174,6 +206,7 @@ function FileTable({ initialFiles = [] }) {
           Download
         </button>
       </div>
+
     </div>
   );
 }
