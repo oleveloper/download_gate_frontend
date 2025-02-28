@@ -7,7 +7,7 @@ const Main = () => {
     const [data, setData] = useState({ release_schedule: [], announcements: [] });
 
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/')
+        axios.get('http://localhost:8000/api/')
             .then(response => {
                 setData(response.data);
             })

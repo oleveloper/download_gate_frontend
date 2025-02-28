@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';
+import axios from '../../utils/axiosConfig';
 import './SignIn.css';
 
 function SignIn() {
@@ -12,24 +13,23 @@ function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setErrors({});
-
     try {
-      const response = await fetch('http://localhost:8000/api/signin/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
+      const response = await axios.post(
+        "/api/signin/",
+        {
           email: email,
           password: password,
-        }),
-      });
+        },
+        {
+          headers: {
+            "Content-Type": "application/json", 
+          },
+        }
+      );
 
-      const data = await response.json();
-      if (response.ok) {
+      const data = response.data;
+      if (response.status === 200) {
         setUser({
           username: data.username,
           is_authenticated: data.is_authenticated,
@@ -74,7 +74,6 @@ function SignIn() {
         </form>
       </div>
       <div className="signin-image">
-        {/* <img src="your-image-url-here.jpg" alt="Decorative" /> */}
       </div>
     </div>
   );

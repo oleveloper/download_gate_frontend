@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Data, FileTable, Sidebar, Header, SignUp, SignIn, ToastMessage } from './components';
-import { SnackbarProvider, useSnackbar } from 'notistack';
+import { SnackbarProvider } from 'notistack';
 import UserContext from './context/UserContext';
 import Main from './pages/Main';
+import axios from './utils/axiosConfig';
 import './App.css';
 
 function App() {
+  useEffect(() => {
+    axios.get('api/csrf/')
+      .then(() => {})
+      .catch((err) => {});
+  }, []);
+
   return (
     <div>
       <Routes>
@@ -24,7 +31,7 @@ function DefaultLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
-  const { user, setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
 
   const [versions, setVersions] = useState([]);
   useEffect(() => {
@@ -42,6 +49,8 @@ function DefaultLayout() {
           is_authenticated: data.is_authenticated,
           is_pending: data.is_pending,
           username: data.username,
+          email: data.email,
+          image: data.profile_image_url
         });
       } else {
         setIsAuthenticated(false);
@@ -60,9 +69,7 @@ function DefaultLayout() {
         <Sidebar versions={versions}/>
         <div className="main">
           <Header isAuthenticated={isAuthenticated} 
-                  setIsAuthenticated={setIsAuthenticated}
-                  username={username}
-                  profileImageUrl={profileImageUrl}/>
+                  setIsAuthenticated={setIsAuthenticated}/>
           <div className="main-content">
             <Routes>
               <Route path="/install/versions/:version" element={<FileTable/>}/>

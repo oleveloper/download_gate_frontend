@@ -1,26 +1,43 @@
-import React, { useEffect, useMemo, useContext } from 'react';
+import React, { useEffect, useMemo, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
 import { Account } from '@toolpad/core/Account';
-import { Button, Box } from '@mui/material';
+import { Button, Box, IconButton } from '@mui/material';
 import { UserContext } from '../../context/UserContext';
 import signOut from '../SignOut/SignOut'; 
 import PersonIcon from '@mui/icons-material/Person';
-
+import SettingsIcon from '@mui/icons-material/Settings';
+import ProfileSetting from '../ProfileSetting/ProfileSetting';
+import axios from '../../utils/axiosConfig';
 import './Header.css';
 
-const Header = ({ isAuthenticated, setIsAuthenticated, username, profileImageUrl }) => {
+const Header = ({ isAuthenticated, setIsAuthenticated }) => {
   const navigate = useNavigate();
-  const userSession = React.useMemo(() => ({
-    user: {
-      name: username,
-      email: '',
-      image: profileImageUrl && typeof profileImageUrl === 'string' ? profileImageUrl : undefined, 
-    },
-  }), [username, profileImageUrl]);
-  const [session, setSession] = React.useState(userSession);
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+  const [userData, setUserData] = useState({
+    name: user?.username || "Guest", // For mui
+    username: user?.username || "Guest",
+    email: user?.email || "",
+    image: user?.image || undefined,
+  });
 
+  const userSession = useMemo(() => ({
+    user: userData,
+  }), [userData]);
+
+  useEffect(() => {
+    if (user) {
+      setUserData((prev) => ({
+        ...prev
+        , name: user.username || "Guest"
+        , username: user.username || "Guest"
+        , email: user.email || ""
+        , image: user.image || undefined
+      }));
+    }
+  }, [user]);
+
+  const [session, setSession] = React.useState(userSession);
   useEffect(() => {
     setSession(userSession);
   }, [userSession]);
@@ -35,8 +52,49 @@ const Header = ({ isAuthenticated, setIsAuthenticated, username, profileImageUrl
     signOut: handleSignOut,
   }), []);
 
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const handleSave = async (data) => {
+    const formData = new FormData();
+    formData.append("username", data.name);
+    formData.append("password", data.password);
+    if (data.profileImage instanceof File) {
+      formData.append("profile_image", data.profileImage); 
+    }
+
+    try {
+      const response = await axios.post(
+        "/api/update/",
+        formData, 
+      );
+
+      if (response.status !== 200) {
+          throw new Error("Failed to update profile");
+      }
+      const data = response.data;
+      setUserData((prev) => ({
+        ...prev,
+        username: data.username,
+        name: data.username,
+        image: data.profile_image_url,
+      }));
+
+      setUser((prev) => ({
+        ...prev,
+        username: data.username,
+        image: data.profile_image_url,
+      }));
+
+
+      console.log("Profile updated successfully:", data);
+    } catch (error) {
+        console.error("Error updating profile:", error);
+    }
+  };
+
   const handleProfileSettings = () => {
-    alert("Profile Settings Clicked!"); // TODO
+    handleOpen()
   };
 
   return (
@@ -44,6 +102,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, username, profileImageUrl
     <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session}>
         {isAuthenticated && (
+          <>
           <Account slotProps={{
             AccountPreview: {
               avatarProps: {
@@ -52,14 +111,19 @@ const Header = ({ isAuthenticated, setIsAuthenticated, username, profileImageUrl
               },
               primaryText: session?.user?.name || "Guest",
             },
-            SignOutButton: {
-              endAdornment: (
-                <Button variant="outlined" size="small" onClick={handleProfileSettings}>
-                  Profile Settings
-                </Button>
-              ),
-            }
           }}/>
+
+          <IconButton onClick={handleProfileSettings}>
+            <SettingsIcon/>
+          </IconButton>
+
+          <ProfileSetting 
+            open={open} 
+            onClose={handleClose} 
+            onSave={handleSave} 
+            user={userData}
+            />
+          </>
         )}
 
         {!isAuthenticated && (
