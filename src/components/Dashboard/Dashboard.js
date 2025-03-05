@@ -72,7 +72,7 @@ const Dashboard = ({ releaseSchedule, announcements }) => {
     
         return (
           <>
-            <TableRow sx={{ "& > *": { borderBottom: "none" } }}>
+            <TableRow>
               <TableCell>
                 <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                   {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -85,7 +85,7 @@ const Dashboard = ({ releaseSchedule, announcements }) => {
               <TableCell align="right">{row.date}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
+              <TableCell style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
                 <Collapse in={open} timeout="auto" unmountOnExit>
                   <Box sx={{ margin: 1 }}>
                     <Typography variant="body1" gutterBottom component="div">
