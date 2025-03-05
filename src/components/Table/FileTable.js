@@ -176,7 +176,6 @@ function FileTable({ initialFiles = [] }) {
           },
         }}
         pageSizeOptions={[5, 10]}
-        autoHeight
         checkboxSelection
         disableSelectionOnClick
         style={{ width: '100%' }}

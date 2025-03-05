@@ -103,8 +103,10 @@ const Dashboard = ({ releaseSchedule, announcements }) => {
     <>
     { user && user.is_authenticated ?
     <div>
-        <h1 className="dashboard-header">Welcome back,
-            <span className="dashboard-username"> {user.username}!</span>
+        <h1 className="dashboard-header">Hello,
+          <span className="dashboard-username"> {user.username}</span>
+          <br></br>
+          <span className="dashboard-welcome">Welcome back!</span>
         </h1>
     </div> 
     : "" }
@@ -116,7 +118,7 @@ const Dashboard = ({ releaseSchedule, announcements }) => {
                     <h2>Notice</h2>
                 </div>
 
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} elevation={0}>
                     <Table stickyHeader aria-label="simple table">
                         <TableHead>
                         <TableRow>

@@ -29,6 +29,14 @@
     background-color: #4C51BF;
 }
 
+.MuiDataGrid-row {
+    background-color: #FFFFFF !important;
+}
+
+.MuiToolbar-root {
+    background-color: #FFFFFF !important;
+}
+
 .custom-data-grid-row:hover {
     background-color: #F7F8FC !important;
 }

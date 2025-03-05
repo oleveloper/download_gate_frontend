@@ -2,6 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Data, FileTable, Sidebar, Header, SignUp, SignIn, ToastMessage } from './components';
 import { SnackbarProvider } from 'notistack';
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import theme from "./theme";
 import UserContext from './context/UserContext';
 import Main from './pages/Main';
 import axios from './utils/axiosConfig';
@@ -15,13 +18,16 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <Routes>
-        <Route path="/*" element={<DefaultLayout />}/>
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
-      </Routes>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div>
+        <Routes>
+          <Route path="/*" element={<DefaultLayout />}/>
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+        </Routes>
+      </div>
+    </ThemeProvider>
   );
 }
 
