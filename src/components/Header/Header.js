@@ -4,6 +4,7 @@ import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider
 import { Account } from '@toolpad/core/Account';
 import { Button, Box, IconButton } from '@mui/material';
 import { UserContext } from '../../context/UserContext';
+import { useSnackbar } from 'notistack';
 import signOut from '../SignOut/SignOut'; 
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -13,6 +14,7 @@ import './Header.css';
 
 const Header = ({ isAuthenticated, setIsAuthenticated }) => {
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { user, setUser } = useContext(UserContext);
   const [userData, setUserData] = useState({
     name: user?.username || "Guest", // For mui
@@ -86,10 +88,9 @@ const Header = ({ isAuthenticated, setIsAuthenticated }) => {
         image: data.profile_image_url,
       }));
 
-
-      console.log("Profile updated successfully:", data);
+      enqueueSnackbar("Profile updated successfully", { variant: "success" })
     } catch (error) {
-        console.error("Error updating profile:", error);
+      enqueueSnackbar("Error updating profile", { variant: "error" })
     }
   };
 
