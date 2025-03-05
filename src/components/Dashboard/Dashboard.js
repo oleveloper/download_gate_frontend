@@ -72,7 +72,7 @@ const Dashboard = ({ releaseSchedule, announcements }) => {
     
         return (
           <>
-            <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
+            <TableRow sx={{ "& > *": { borderBottom: "none" } }}>
               <TableCell>
                 <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                   {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
