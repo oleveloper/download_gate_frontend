@@ -176,12 +176,13 @@ function FileTable({ initialFiles = [] }) {
           },
         }}
         pageSizeOptions={[5, 10]}
+        autoHeight
         checkboxSelection
         disableSelectionOnClick
         style={{ width: '100%' }}
         key={`${location.key}-${windowWidth}`}
         getRowClassName={(params) => 'custom-data-grid-row'}
-        rowSelectionModel={selectedFile || []}
+        rowSelectionModel={selectedFile.filter(id => filteredRows.some(row => row.id === id))}
         onRowSelectionModelChange={(selection) => {
           setSelectedFile(selection);
         }}
