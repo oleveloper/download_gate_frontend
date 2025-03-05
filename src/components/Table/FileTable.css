@@ -37,6 +37,10 @@
     background-color: #FFFFFF !important;
 }
 
+.MuiDataGrid-overlay {
+    background-color: #FFFFFF !important;
+}
+
 .custom-data-grid-row:hover {
     background-color: #F7F8FC !important;
 }
