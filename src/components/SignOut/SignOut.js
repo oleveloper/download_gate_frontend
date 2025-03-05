@@ -19,7 +19,6 @@ const signOut = async (setUser) => {
 
         window.location.href = '/';
     } else {
-        console.error('Failed to sign out');
     }
 };
 

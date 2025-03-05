@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useSnackbar } from 'notistack';
 import config from '../../config';
 import axios from "axios";
 import FileTable from "../Table/FileTable";
@@ -24,6 +25,7 @@ function GradientCircularProgress() {
 function Data({ setVersions }) {
   const API_BASE_URL = config.API_BASE_URL;
   const { category } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
   const [file, setFile] = useState([]); 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -35,7 +37,7 @@ function Data({ setVersions }) {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Fail to retrieve versions", error);
+        enqueueSnackbar("Fail to retrieve versions:" + error, { varient: 'error' })
         setLoading(false);
       });
     }, [category]);

@@ -46,7 +46,6 @@ return (
               to={`/install/versions/${v}`}
               onClick={
                 (e) => {e.stopPropagation(); 
-                console.log(`Navigating to: /install/version/${v}`);
               }}
             >
               {v}
