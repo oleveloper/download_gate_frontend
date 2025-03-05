@@ -41,6 +41,10 @@
     background-color: #FFFFFF !important;
 }
 
+.MuiDataGrid-withBorderColor {
+    background-color: #FFFFFF !important;
+}
+
 .custom-data-grid-row:hover {
     background-color: #F7F8FC !important;
 }

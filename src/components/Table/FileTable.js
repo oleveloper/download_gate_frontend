@@ -182,7 +182,7 @@ function FileTable({ initialFiles = [] }) {
         style={{ width: '100%' }}
         key={`${location.key}-${windowWidth}`}
         getRowClassName={(params) => 'custom-data-grid-row'}
-        rowSelectionModel={selectedFile.filter(id => filteredRows.some(row => row.id === id))}
+        rowSelectionModel={selectedFile || []}
         onRowSelectionModelChange={(selection) => {
           setSelectedFile(selection);
         }}
