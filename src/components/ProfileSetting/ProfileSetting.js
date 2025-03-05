@@ -48,7 +48,7 @@ const ProfileSetting = ({ open, onClose, onSave, user }) => {
         </IconButton>
 
         <Box className="profile-avatar-container">
-          <Avatar src={previewImage} className="profile-avatar" />
+          <Avatar src={previewImage || user?.image} className="profile-avatar" />
           <IconButton className="profile-camera-btn" component="label">
             <CameraAltIcon fontSize="small" />
             <input type="file" 
