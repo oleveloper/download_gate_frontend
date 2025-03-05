@@ -8,6 +8,7 @@ import theme from "./theme";
 import UserContext from './context/UserContext';
 import Main from './pages/Main';
 import axios from './utils/axiosConfig';
+import config from './config';
 import './App.css';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
 }
 
 function DefaultLayout() {
+  const API_BASE_URL = config.API_BASE_URL;
   const [errorMessage, setErrorMessage] = useState('');
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,7 +44,7 @@ function DefaultLayout() {
   const [versions, setVersions] = useState([]);
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const response = await fetch('http://localhost:8000/api/check-auth/', {
+      const response = await fetch(`${API_BASE_URL}/api/check-auth/`, {
         method: 'GET',
         credentials: 'include',
       });

@@ -1,9 +1,10 @@
 import axios from 'axios';
+import config from '../config';
 import { getCookie } from './cookieUtils';
 
 const csrftoken = getCookie();
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000/',
+  baseURL: `${config.API_BASE_URL}/`,
   withCredentials: true,
 });
 

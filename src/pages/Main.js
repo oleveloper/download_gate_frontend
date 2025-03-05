@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Main.css';
 import { Dashboard } from '../components';
+import config from '../config';
 
 const Main = () => {
+    const API_BASE_URL = config.API_BASE_URL;
     const [data, setData] = useState({ release_schedule: [], announcements: [] });
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/')
+        axios.get(`${API_BASE_URL}/api/`)
             .then(response => {
                 setData(response.data);
             })

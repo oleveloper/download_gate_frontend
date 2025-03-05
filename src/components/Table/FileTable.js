@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import config from '../../config';
 import { useParams, useLocation } from 'react-router-dom';
 import { DataGrid } from '@mui/x-data-grid';
 import { useSnackbar } from 'notistack';
@@ -7,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './FileTable.css'
 
 function FileTable({ initialFiles = [] }) {
+  const API_BASE_URL = config.API_BASE_URL;
   const { version } = useParams();
   const location = useLocation();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -79,17 +81,17 @@ function FileTable({ initialFiles = [] }) {
     const fetchFiles = async () => {
       let url = '';
       if (type === 'install') {
-        url = `http://localhost:8000/api/install/`;
+        url = `${API_BASE_URL}/api/install/`;
       } else if (type === 'patch') {
-        url = `http://localhost:8000/api/patch/`;
+        url = `${API_BASE_URL}/api/patch/`;
       } if (type === 'install-version') {
-        url = `http://localhost:8000/api/install/versions/${version}/`;
+        url = `${API_BASE_URL}/api/install/versions/${version}/`;
       } else if (type === 'patch-version') {
-        url = `http://localhost:8000/api/patch/versions/${version}/`;
+        url = `${API_BASE_URL}/api/patch/versions/${version}/`;
       } else if (type === 'jdk') {
-        url = `http://localhost:8000/api/jdk/`;
+        url = `${API_BASE_URL}/api/jdk/`;
       } else if (type === 'license') {
-        url = `http://localhost:8000/api/license/`;
+        url = `${API_BASE_URL}/api/license/`;
       }
 
       if (url === '') return;

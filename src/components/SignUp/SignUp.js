@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../../config';
 import { useNavigate } from 'react-router-dom';
 import './SignUp.css';
 
@@ -10,6 +11,7 @@ function SignUp() {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const API_BASE_URL = config.API_BASE_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +33,7 @@ function SignUp() {
     }
 
     try {
-        const response = await fetch('http://localhost:8000/api/signup/', {
+        const response = await fetch(`${API_BASE_URL}/api/signup/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

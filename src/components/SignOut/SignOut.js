@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
-import { UserContext } from '../../context/UserContext';
+import config from '../../config';
 
 const signOut = async (setUser) => {
-    const response = await fetch('http://localhost:8000/api/signout/', {
+    const API_BASE_URL = config.API_BASE_URL;
+    const response = await fetch(`${API_BASE_URL}/api/signout/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
