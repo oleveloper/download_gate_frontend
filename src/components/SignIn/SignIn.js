@@ -16,17 +16,10 @@ function SignIn() {
     setErrors({});
     try {
       const response = await axios.post(
-        "/api/signin/",
-        {
+        "/api/signin/", {
           email: email,
           password: password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json", 
-          },
-        }
-      );
+        });
 
       const data = response.data;
       if (response.status === 200) {

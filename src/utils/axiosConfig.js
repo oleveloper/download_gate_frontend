@@ -2,19 +2,37 @@ import axios from 'axios';
 import config from '../config';
 import { getCookie } from './cookieUtils';
 
-const csrftoken = getCookie();
 const axiosInstance = axios.create({
   baseURL: `${config.API_BASE_URL}/`,
   withCredentials: true,
+  xsrfCookieName: 'csrftoken',
+  xsrfHeaderName: 'X-CSRFToken',
+  headers: {
+    'X-CSRFToken': getCookie('csrftoken') || '',
+  }
 });
 
-axiosInstance.defaults.headers.common['X-CSRFToken'] = csrftoken;
-axiosInstance.defaults.withCredentials = true;
+const authToken = localStorage.getItem('authToken');
+if (authToken) {
+  axiosInstance.defaults.headers['Authorization'] = `Token ${authToken}`;
+}
 
-axiosInstance.interceptors.request.use((config) => {
-  const token = getCookie('csrftoken');
-  config.headers['X-CSRFToken'] = token;
-  return config;
-});
+axiosInstance.get('/api/csrf/')
+  .then(() => {
+  })
+  .catch(err => {
+    console.error('Error fetching CSRF cookie:', err);
+  });
+
+axiosInstance.interceptors.request.use(
+  config => {
+    const csrfToken = getCookie('csrftoken');
+    if (csrfToken) {
+      config.headers['X-CSRFToken'] = csrfToken;
+    }
+    return config;
+  },
+  error => Promise.reject(error)
+);
 
 export default axiosInstance;

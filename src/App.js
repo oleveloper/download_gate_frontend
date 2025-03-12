@@ -7,15 +7,23 @@ import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./theme";
 import UserContext from './context/UserContext';
 import Main from './pages/Main';
-import axios from './utils/axiosConfig';
+import axiosInstance from './utils/axiosConfig';
 import config from './config';
 import './App.css';
 
 function App() {
+  const [csrfReady, setCsrfReady] = useState(false);
+
   useEffect(() => {
-    axios.get('api/csrf/')
-      .then(() => {})
-      .catch((err) => {});
+    async function initCsrf() {
+      try {
+        await axiosInstance.get('/api/csrf/');
+        setCsrfReady(true);
+      } catch (error) {
+        console.error('CSRF init error:', error);
+      }
+    }
+    initCsrf();
   }, []);
 
   return (

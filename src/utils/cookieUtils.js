@@ -1,14 +1,7 @@
-export function getCookie() {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (const cookie of cookies) {
-        const trimmed = cookie.trim();
-        if (trimmed.startsWith('csrftoken=')) {
-          cookieValue = trimmed.substring('csrftoken='.length);
-          break;
-        }
-      }
-    }
-    return cookieValue;
+export function getCookie(name = 'csrftoken') {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+
+  return null;
 }
