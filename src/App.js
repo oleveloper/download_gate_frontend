@@ -43,7 +43,6 @@ function App() {
 function DefaultLayout() {
   const API_BASE_URL = config.API_BASE_URL;
   const [errorMessage, setErrorMessage] = useState('');
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
@@ -76,7 +75,7 @@ function DefaultLayout() {
       }
     };
     checkAuthStatus();
-  }, [setUser]);
+  }, []);
 
   return (
     <SnackbarProvider maxSnack={3} autoHideDuration={2000}>
@@ -90,7 +89,7 @@ function DefaultLayout() {
             <Routes>
               <Route path="/install/versions/:version" element={<FileTable/>}/>
               <Route path="/patch/versions/:version" element={<FileTable/>}/>
-              <Route path="/:category" element={<Data setVersions={setVersions}/>}/>
+              <Route path="/:category" element={<FileTable setVersions={setVersions}/>}/>
               <Route path="/" element={<Main />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>

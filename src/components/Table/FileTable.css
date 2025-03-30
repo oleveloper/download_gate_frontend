@@ -60,3 +60,9 @@
 .MuiCheckbox-root.Mui-checked {
     color: #4C51BF !important;
 }
+
+.issue-link {
+    all: unset;
+    cursor: pointer;
+    text-decoration: none;
+}

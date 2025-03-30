@@ -4,29 +4,55 @@ import config from '../../config';
 import { useParams, useLocation } from 'react-router-dom';
 import { DataGrid } from '@mui/x-data-grid';
 import { useSnackbar } from 'notistack';
+import CircularProgress from "@mui/material/CircularProgress";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './FileTable.css'
+import './FileTable.css';
 
-function FileTable({ initialFiles = [] }) {
+function GradientCircularProgress() {
+  return (
+    <React.Fragment>
+      <svg width={0} height={0}>
+        <defs>
+          <linearGradient id="my_gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#e01cd5" />
+            <stop offset="100%" stopColor="#1CB5E0" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <CircularProgress sx={{ 'svg circle': { stroke: 'url(#my_gradient)' } }} />
+    </React.Fragment>
+  );
+}
+
+function FileTable({ setVersions }) {
   const API_BASE_URL = config.API_BASE_URL;
-  const { version } = useParams();
   const location = useLocation();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [type, setType] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [files, setFiles] = useState(initialFiles);
+  const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
-
-  const rows = files.map((file, index) => ({
-    id: index + 1
-    , ...file,
-  }));
+  const { category, version } = useParams();
+  const isHotfix = category === 'hotfix';
+  const rows = files;
 
   const columns = [
     { field: 'type', headerName: 'OS', flex:0.5, minWidth: 50, headerAlign: 'center', align: 'center'
       , renderCell: (params) => getIcon(params.row) },
     { field: 'name', headerName: 'File Name', flex: 3, minWidth: 200},
+    { field: 'ticket', headerName: 'Issue', flex: 1, minWidth: 200, hide: !isHotfix
+      , renderCell: (params) => {
+        const url = params.value;
+        if (!url) return '';
+        const label = url.substring(url.lastIndexOf('/') + 1);
+        return (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="issue-link">
+            {label}
+          </a>
+        )
+      }
+    },
     { field: 'size', headerName: 'File Size', flex: 1, minWidth: 100
       , valueFormatter: (value) => {
         if (!value || isNaN(value)) return "N/A";
@@ -40,10 +66,6 @@ function FileTable({ initialFiles = [] }) {
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
-
-  const filteredRows = rows.filter((row) => {
-    return row.name && row.name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
 
   useEffect(() => {
     setSelectedFile([]);
@@ -61,56 +83,28 @@ function FileTable({ initialFiles = [] }) {
   }, []);
 
   useEffect(() => {
-    if (location.pathname.includes('/install/')) {
-      setType('install-version');
-    } else if (location.pathname.includes('/patch/')) {
-      setType('patch-version');
-    } else if (location.pathname.includes('/install')) {
-      setType('install');
-    } else if (location.pathname.includes('/patch')) {
-      setType('patch');
-    }  else if (location.pathname.includes('/jdk')) {
-      setType('jdk');
-    } else if (location.pathname.includes('/license')) {
-      setType('license');
-    }
-  }, [location.pathname, type]);
-
-  useEffect(() => {
     setFiles([]);
-    const fetchFiles = async () => {
-      let url = '';
-      if (type === 'install') {
-        url = `${API_BASE_URL}/api/install/`;
-      } else if (type === 'patch') {
-        url = `${API_BASE_URL}/api/patch/`;
-      } if (type === 'install-version') {
-        url = `${API_BASE_URL}/api/install/versions/${version}/`;
-      } else if (type === 'patch-version') {
-        url = `${API_BASE_URL}/api/patch/versions/${version}/`;
-      } else if (type === 'jdk') {
-        url = `${API_BASE_URL}/api/jdk/`;
-      } else if (type === 'license') {
-        url = `${API_BASE_URL}/api/license/`;
-      }
+    setLoading(true);
 
-      if (url === '') return;
-      try {
-        const response = await axios
-        .get(url, { withCredentials: true, });
-        const files = response.data.files.map((file, index) => ({
-          id: index + 1
-          , ...file
-        }));
-        setFiles(files);
-      } catch (err) {
-        setFiles([]);
-      } finally {
-      }
-    };
+    let url = version
+      ? `${API_BASE_URL}/api/${category}/versions/${version}/`
+      : `${API_BASE_URL}/api/${category}/`;
 
-    fetchFiles();
-  }, [type, version]);
+    axios.get(url, { withCredentials: true })
+    .then((response) => {
+      if (setVersions) setVersions(response.data.versions || []);
+      setFiles(response.data.files.map((file, idx) => ({
+        id: idx + 1,
+        ...file
+      })) || []);
+      setLoading(false);
+    })
+    .catch((error) => {
+      enqueueSnackbar('Fail to retrieve files: ' + error, { variant: 'error' });
+      setLoading(false);
+    });
+
+  }, [API_BASE_URL, category, version]);
 
   const getIcon = (file) => {
     if (!file || !file.name) return '';
@@ -127,9 +121,9 @@ function FileTable({ initialFiles = [] }) {
     const selectedFiles = files.filter(file => selectedFile.includes(file.id));
     let command = '';
     if (selectedFiles.length === 1) {
-      command = `curl -O ${selectedFiles[0].url}`;
+      command = `curl -L -o "${selectedFiles[0].name}" "${selectedFiles[0].url}"`;
     } else if (selectedFiles.length > 1) {
-      command =  selectedFiles.map((file) => `curl -O ${file.url}`).join(" && ");
+      command =  selectedFiles.map((file) => `curl -L -o "${file.name}" "${file.url}"`).join(" && ");
     }
 
     if (!command) {
@@ -140,7 +134,6 @@ function FileTable({ initialFiles = [] }) {
       });
     }
   })
-
 
   const handleDownload = (() => {
     const selectedFiles = files.filter(file => selectedFile.includes(file.id));
@@ -161,6 +154,18 @@ function FileTable({ initialFiles = [] }) {
     });
   });
 
+  const filteredRows = rows.filter((row) => {
+    return row.name && row.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <GradientCircularProgress />
+      </div>
+    );
+  }
+
   return (
     <div>
       <input 
@@ -174,10 +179,10 @@ function FileTable({ initialFiles = [] }) {
         columnVisibilityModel={{ url: false }}
         initialState={{
           pagination: {
-            paginationModel: { page: 0, pageSize: 10 },
+            paginationModel: { page: 0, pageSize: 15 },
           },
         }}
-        pageSizeOptions={[5, 10]}
+        pageSizeOptions={[10, 15, 25, 50, 100]}
         autoHeight
         checkboxSelection
         disableSelectionOnClick
@@ -196,7 +201,7 @@ function FileTable({ initialFiles = [] }) {
             setSelectedFile(null);
             setTimeout(() => setSelectedFile([]), 100);
           }}>
-            Copy
+            CURL
           </button>
         </>
 

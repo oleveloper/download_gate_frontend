@@ -1,4 +1,3 @@
-export { default as Data } from './Data/Data';
 export { default as FileTable } from './Table/FileTable';
 export { default as Sidebar } from './Sidebar/Sidebar';
 export { default as Header } from './Header/Header';
