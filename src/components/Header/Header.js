@@ -147,7 +147,8 @@ const Header = ({ isAuthenticated, setIsAuthenticated }) => {
                 color: '#7B7F9E',
                 '&:hover': { borderColor: '#4C51BF', color: '#4C51BF' }
               }}
-              onClick={() => navigate('/signup')}
+              // onClick={() => navigate('/signup')}
+              onClick={() => enqueueSnackbar('Sign up is currently unavailable', { variant: 'warning' })}
             >
               Sign Up
             </Button>
