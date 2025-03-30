@@ -65,4 +65,6 @@
     all: unset;
     cursor: pointer;
     text-decoration: none;
+    display: contents;
+    line-height: normal;
 }

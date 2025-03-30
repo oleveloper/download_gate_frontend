@@ -5,6 +5,8 @@ import { useParams, useLocation } from 'react-router-dom';
 import { DataGrid } from '@mui/x-data-grid';
 import { useSnackbar } from 'notistack';
 import CircularProgress from "@mui/material/CircularProgress";
+import Tooltip from '@mui/material/Tooltip';
+import SearchIcon from '@mui/icons-material/Search';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './FileTable.css';
 
@@ -44,13 +46,20 @@ function FileTable({ setVersions }) {
       const url = params.value;
       if (!url) return '';
       const label = url.substring(url.lastIndexOf('/') + 1);
+      const description = params.row.description;
       return (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="issue-link">
-          {label}
-        </a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <a href={url} target="_blank" rel="noopener noreferrer" className="issue-link">
+            {label}
+          </a>
+          <Tooltip title={description}>
+            <SearchIcon fontSize="small" style={{ cursor: 'pointer' }} />
+          </Tooltip>
+        </div>
       )
     }
   }
+
   const extraColumnsByCategory = {
     hotfix: [ticketColumn],
   }
