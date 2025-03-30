@@ -34,25 +34,32 @@ function FileTable({ setVersions }) {
   const [loading, setLoading] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
   const { category, version } = useParams();
-  const isHotfix = category === 'hotfix';
   const rows = files;
-
+  const ticketColumn = { 
+    field: 'ticket'
+    , headerName: 'Issue'
+    , flex: 1
+    , minWidth: 200
+    , renderCell: (params) => {
+      const url = params.value;
+      if (!url) return '';
+      const label = url.substring(url.lastIndexOf('/') + 1);
+      return (
+        <a href={url} target="_blank" rel="noopener noreferrer" className="issue-link">
+          {label}
+        </a>
+      )
+    }
+  }
+  const extraColumnsByCategory = {
+    hotfix: [ticketColumn],
+  }
+  const extraColumns = extraColumnsByCategory[category] || [];
   const columns = [
     { field: 'type', headerName: 'OS', flex:0.5, minWidth: 50, headerAlign: 'center', align: 'center'
       , renderCell: (params) => getIcon(params.row) },
     { field: 'name', headerName: 'File Name', flex: 3, minWidth: 200},
-    { field: 'ticket', headerName: 'Issue', flex: 1, minWidth: 200, hide: !isHotfix
-      , renderCell: (params) => {
-        const url = params.value;
-        if (!url) return '';
-        const label = url.substring(url.lastIndexOf('/') + 1);
-        return (
-          <a href={url} target="_blank" rel="noopener noreferrer" className="issue-link">
-            {label}
-          </a>
-        )
-      }
-    },
+    ...extraColumns,
     { field: 'size', headerName: 'File Size', flex: 1, minWidth: 100
       , valueFormatter: (value) => {
         if (!value || isNaN(value)) return "N/A";
