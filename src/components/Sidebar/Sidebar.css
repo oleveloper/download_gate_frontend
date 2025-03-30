@@ -24,6 +24,9 @@
     align-items: center;
     justify-content: center;
     margin-right: 10px;
+
+    background-image: url('../../../public/favicon.ico');
+    background-size: cover;
 }
 
 .logo span {
@@ -86,4 +89,10 @@ a.active, a:hover {
 
 .submenu a:hover {
     color: #4C51BF;
+}
+
+.install-list-scroll {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 8px;
 }
