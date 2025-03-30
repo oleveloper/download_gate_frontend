@@ -72,7 +72,14 @@ function FileTable({ setVersions }) {
     { field: 'size', headerName: 'File Size', flex: 1, minWidth: 100
       , valueFormatter: (value) => {
         if (!value || isNaN(value)) return "N/A";
-        return `${(value / (1024 * 1024)).toFixed(2)} MB`;
+        const sizeInMB = value / (1024 * 1024);
+        const sizeInKB = value / 1024;
+
+        if (sizeInMB < 1) {
+          return `${sizeInKB.toFixed(2)} KB`;
+        } else {
+          return `${sizeInMB.toFixed(2)} MB`;
+        }
       },
     },
     { field: 'upload_date', headerName: 'Upload Date', minWidth: 100, flex: 1 },
