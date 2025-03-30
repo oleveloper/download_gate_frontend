@@ -7,22 +7,7 @@ const axiosInstance = axios.create({
   withCredentials: true,
   xsrfCookieName: 'csrftoken',
   xsrfHeaderName: 'X-CSRFToken',
-  headers: {
-    'X-CSRFToken': getCookie('csrftoken') || '',
-  }
 });
-
-const authToken = localStorage.getItem('authToken');
-if (authToken) {
-  axiosInstance.defaults.headers['Authorization'] = `Token ${authToken}`;
-}
-
-axiosInstance.get('/api/csrf/')
-  .then(() => {
-  })
-  .catch(err => {
-    console.error('Error fetching CSRF cookie:', err);
-  });
 
 axiosInstance.interceptors.request.use(
   config => {

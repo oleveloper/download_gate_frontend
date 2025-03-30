@@ -1,16 +1,11 @@
-import config from '../../config';
+import axios from '../../utils/axiosConfig';
 
 const signOut = async (setUser) => {
-    const API_BASE_URL = config.API_BASE_URL;
-    const response = await fetch(`${API_BASE_URL}/api/signout/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-    });
+    await axios.get('/api/csrf/');
+    const response = await axios.post(
+        "/api/signout/", {}, { withCredentials: true, });
 
-    if (response.ok) {
+    if (response.status === 200) {
         setUser({
             username: '',
             is_authenticated: false,
