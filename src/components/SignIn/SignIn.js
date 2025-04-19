@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';
 import axios from '../../utils/axiosConfig';
+import { fetchAndSetCsrfToken } from '../../utils/csrf';
 import './SignIn.css';
 
 function SignIn() {
@@ -15,14 +16,13 @@ function SignIn() {
     e.preventDefault();
     setErrors({});
     try {
-      await axios.get('/api/csrf/');
+      await fetchAndSetCsrfToken();
       const response = await axios.post(
         "/api/signin/", {
           email: email,
           password: password,
         });
 
-      await axios.get('/api/csrf/');
       const data = response.data;
       if (response.status === 200) {
         setUser({

@@ -10,6 +10,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ProfileSetting from '../ProfileSetting/ProfileSetting';
 import axios from '../../utils/axiosConfig';
+import { fetchAndSetCsrfToken } from '../../utils/csrf';
 import './Header.css';
 
 const Header = ({ isAuthenticated, setIsAuthenticated }) => {
@@ -58,6 +59,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSave = async (data) => {
+    await fetchAndSetCsrfToken();
     const formData = new FormData();
     formData.append("username", data.name);
     formData.append("password", data.password);
@@ -67,8 +69,13 @@ const Header = ({ isAuthenticated, setIsAuthenticated }) => {
 
     try {
       const response = await axios.post(
-        "/api/update/",
-        formData, 
+        "/api/update/"
+        , formData
+        , {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
 
       if (response.status !== 200) {

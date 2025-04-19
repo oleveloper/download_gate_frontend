@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Data, FileTable, Sidebar, Header, SignUp, SignIn, ToastMessage } from './components';
+import { FileTable, Sidebar, Header, SignUp, SignIn, ToastMessage } from './components';
 import { SnackbarProvider } from 'notistack';
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./theme";
 import UserContext from './context/UserContext';
 import Main from './pages/Main';
-import axiosInstance from './utils/axiosConfig';
 import config from './config';
+import { fetchAndSetCsrfToken } from './utils/csrf';
 import './App.css';
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
   useEffect(() => {
     async function initCsrf() {
       try {
-        await axiosInstance.get('/api/csrf/');
+        fetchAndSetCsrfToken();
         setCsrfReady(true);
       } catch (error) {
         console.error('CSRF init error:', error);
