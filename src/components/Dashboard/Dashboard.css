@@ -75,4 +75,10 @@ h1 {
 .dashboard-username {
     color: #3D4168;
 }
-  
+
+.notice-table {
+    white-space: pre-line;
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
+  }

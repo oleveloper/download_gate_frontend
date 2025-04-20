@@ -85,7 +85,7 @@ const Dashboard = ({ releaseSchedule, announcements }) => {
               <TableCell align="right">{row.date}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
+              <TableCell  className="notice-table" colSpan={4}>
                 <Collapse in={open} timeout="auto" unmountOnExit>
                   <Box sx={{ margin: 1 }}>
                     <Typography variant="body1" gutterBottom component="div">
