@@ -65,8 +65,10 @@ function FileTable({ setVersions }) {
   }
   const extraColumns = extraColumnsByCategory[category] || [];
   const columns = [
-    { field: 'type', headerName: 'OS', flex:0.5, minWidth: 50, headerAlign: 'center', align: 'center'
-      , renderCell: (params) => getIcon(params.row) },
+    { field: 'os', headerName: 'OS', flex:0.5, minWidth: 50, headerAlign: 'center', align: 'center'
+      , sortable: true
+      , valueFormatter: (params) => params.value?.toLowerCase() || ''
+      , renderCell: (params) => getIcon(params) },
     { field: 'name', headerName: 'File Name', flex: 3, minWidth: 200},
     ...extraColumns,
     { field: 'size', headerName: 'File Size', flex: 1, minWidth: 100
@@ -83,7 +85,7 @@ function FileTable({ setVersions }) {
       },
     },
     { field: 'upload_date', headerName: 'Upload Date', minWidth: 100, flex: 1 },
-    { field: 'url', headerName: 'Presigned URL', minWidth: 0, flex: 0, hide: true },
+    { field: 'key', headerName: '', minWidth: 0, flex: 0, hide: true },
   ];
 
   const handleSearchChange = (event) => {
@@ -108,6 +110,7 @@ function FileTable({ setVersions }) {
   useEffect(() => {
     setFiles([]);
     setLoading(true);
+    setSearchTerm('');
 
     let url = version
       ? `${API_BASE_URL}/api/${category}/versions/${version}/`
@@ -129,34 +132,44 @@ function FileTable({ setVersions }) {
 
   }, [API_BASE_URL, category, version]);
 
-  const getIcon = (file) => {
-    if (!file || !file.name) return '';
-    if (file.name.toLowerCase().includes('linux')) {
+  const getIcon = (params) => {
+    const os = params.value?.toLowerCase();
+    if (!os) 
+      return '';
+    if (os === 'linux') {
       return <i className="bi-tencent-qq"></i>;
     } 
-    if (file.name.toLowerCase().includes('win')) {
+    if (os === 'windows') {
       return <i className="bi bi-windows"></i>;
     }
     return '';
   };
 
-  const handleCopy = (() => {
+  const handleCopy = async () => {
     const selectedFiles = files.filter(file => selectedFile.includes(file.id));
-    let command = '';
-    if (selectedFiles.length === 1) {
-      command = `curl -L -o "${selectedFiles[0].name}" "${selectedFiles[0].url}"`;
-    } else if (selectedFiles.length > 1) {
-      command =  selectedFiles.map((file) => `curl -L -o "${file.name}" "${file.url}"`).join(" && ");
-    }
-
-    if (!command) {
+    if (selectedFiles.length === 0) {
       enqueueSnackbar("Please select at least one file", { variant: "warning" });
-    } else {
-      navigator.clipboard.writeText(command).then(() => {
-        enqueueSnackbar("Download command copied to clipboard", { variant: "success" });
-      });
+      return;
     }
-  })
+  
+    try {
+      const curlCommands = await Promise.all(
+        selectedFiles.map(async ({ key, name }) => {
+          const response = await axios.get(`${API_BASE_URL}/api/presign/?key=${encodeURIComponent(key)}`);
+          const url = response.data.url;
+          return `curl -L -o "${name}" "${url}"`;
+        })
+      );
+  
+      const command = curlCommands.join("\n");
+  
+      await navigator.clipboard.writeText(command);
+      enqueueSnackbar("Download command copied to clipboard", { variant: "success" });
+    } catch (error) {
+      console.error("Error fetching presigned URLs", error);
+      enqueueSnackbar("There was an error generating the command", { variant: "error" });
+    }
+  };  
 
   const handleDownload = (() => {
     const selectedFiles = files.filter(file => selectedFile.includes(file.id));
@@ -165,15 +178,25 @@ function FileTable({ setVersions }) {
       return;
     }
 
-    selectedFiles.forEach(async ({ url, name }, index) => {
-      setTimeout(() => {
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }, index * 2000);
+    selectedFiles.forEach(async ({ key, name }, index) => {
+      var url = '';
+      axios.get(`${API_BASE_URL}/api/presign/?key=${encodeURIComponent(key)}`)
+      .then(response => {
+        url = response.data.url;
+
+        setTimeout(() => {
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, index * 2000);
+      })
+      .catch(error => {
+          enqueueSnackbar("There was an error fetching the data: " + error
+          , { varient: 'error' })
+      });
     });
   });
 
@@ -195,11 +218,12 @@ function FileTable({ setVersions }) {
       type="text" 
       className="search-bar" 
       placeholder="File name search"
+      value={searchTerm}
       onChange={handleSearchChange} />
       <DataGrid
         rows={filteredRows}
         columns={columns}
-        columnVisibilityModel={{ url: false }}
+        columnVisibilityModel={{ key: false }}
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 15 },
