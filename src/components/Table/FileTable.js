@@ -191,6 +191,7 @@ function FileTable({ setVersions }) {
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
+          enqueueSnackbar("Starting the download of the selected file(s)", { variant: "success" });
         }, index * 2000);
       })
       .catch(error => {
