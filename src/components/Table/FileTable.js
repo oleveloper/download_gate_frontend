@@ -178,6 +178,7 @@ function FileTable({ setVersions }) {
       return;
     }
 
+    enqueueSnackbar("Starting the download of the selected file(s)", { variant: "success" });
     selectedFiles.forEach(async ({ key, name }, index) => {
       var url = '';
       axios.get(`${API_BASE_URL}/api/presign/?key=${encodeURIComponent(key)}`)
@@ -191,7 +192,6 @@ function FileTable({ setVersions }) {
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-          enqueueSnackbar("Starting the download of the selected file(s)", { variant: "success" });
         }, index * 2000);
       })
       .catch(error => {
